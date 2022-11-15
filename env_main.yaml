@@ -1,0 +1,159 @@
+esphome:substitutions:
+  name: env_main
+esphome:
+  name: $name
+  platform: ESP32
+  board: lolin32
+time:
+  - platform: sntp
+    id: esptime
+
+wifi:
+  ssid: !secret wifi_iot_ssid
+  password: !secret wifi_iot_password
+  use_address: 192.168.8.116
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: $name
+    password: $name
+captive_portal:
+
+# Enable logging
+logger:
+  baud_rate: 0
+# Enable Home Assistant API
+api:
+
+ota:
+text_sensor:
+  - platform: template
+    name: Uptime Human Readable
+    id: uptime_human
+    icon: mdi:clock-start
+  - platform: wifi_info
+    ip_address:
+      id: ip_address
+      name: ESP IP Address
+    ssid:
+      id: wifi_name
+
+i2c:
+  sda: 21
+  scl: 22
+  scan: False
+  id: bus_a
+  frequency: 200kHz
+font:
+#  - file: "Inconsolata-Regular.ttf"
+  - file: "slkscr.ttf"
+    id: small_font
+    size: 8
+#    glyphs: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 .,:&°%"
+  - file: "Inconsolata-CondensedBold.ttf"
+    id: big_font
+    size: 13
+#    glyphs: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 .,:&°%"
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    address: 0x3C
+    id: my_display
+    contrast: 0.30
+    pages:
+      - id: page1
+        lambda: |-
+          it.fill(COLOR_OFF);
+          it.printf(it.get_width()/2, 1, id(big_font), TextAlign::TOP_LEFT, "H %.1f%%", id(humidity).state );
+          it.printf(1, 1, id(big_font), TextAlign::TOP_LEFT, "%.1f°C", id(temp).state );
+          
+          it.printf(1, 16, id(small_font), TextAlign::TOP_LEFT, "Pm 2.5");
+          it.printf(it.get_width()/2, 16, id(small_font), TextAlign::TOP_LEFT, "Pm 10");
+
+          it.printf(1, 21, id(big_font), TextAlign::TOP_LEFT, "%.1f", id(pm_2_5).state);
+          it.printf(it.get_width()/2, 21, id(big_font), TextAlign::TOP_LEFT, "%.1f", id(pm_10_0).state);
+
+          it.printf(1, 37, id(small_font), TextAlign::TOP_LEFT, "eCo2");
+          it.printf(it.get_width()/2, 37, id(small_font), TextAlign::TOP_LEFT, "tvoc");
+          it.printf(1, 42, id(big_font), TextAlign::TOP_LEFT, "%.1f", id(eco2).state );
+          it.printf(it.get_width()/2, 42, id(big_font), TextAlign::TOP_LEFT, "%.1f", id(tvoc).state );
+
+          it.printf(1, 58, id(small_font), TextAlign::TOP_LEFT, "Uptime %s", id(uptime_human).state.c_str() );
+
+uart:
+  rx_pin: 3
+  tx_pin: 1
+  baud_rate: 9600
+
+sensor:
+  - platform: sds011
+    pm_2_5:
+      name: "Particulate Matter <2.5µm Concentration"
+      id: pm_2_5
+    pm_10_0:
+      name: "Particulate Matter <10.0µm Concentration"
+      id: pm_10_0
+    update_interval: 5min
+
+  - platform: sgp30
+    eco2:
+      name: "eCO2"
+      accuracy_decimals: 1
+      id: eco2
+      filters:
+        - sliding_window_moving_average:
+            window_size: 60
+            send_every: 30
+    tvoc:
+      name: "TVOC"
+      accuracy_decimals: 1
+      id: tvoc
+      filters:
+        - sliding_window_moving_average:
+            window_size: 60
+            send_every: 30
+    # 19/11/2021 0x9463, TVOC baseline: 0x93BE
+    # 20/11/2021 0x9301, TVOC baseline: 0x94BC
+    # 19/01/2022 eCO2 0x8FBD, TVOC baseline: 0x94EE
+    # 29/08/2022 eCO2 0x8DE9, TVOC baseline: 0x9207
+    baseline:
+      eco2_baseline: 0x8DE9
+      tvoc_baseline: 0x9207
+    store_baseline: true
+    address: 0x58
+    update_interval: 1s
+    compensation:
+      temperature_source: temp
+      humidity_source: humidity
+
+  - platform: aht10
+    temperature:
+      id: temp
+      name: "Temperature"
+    humidity:
+      id: humidity
+      name: "Humidity"
+    update_interval: 10s
+
+  - platform: uptime
+    name: Uptime Sensor
+    id: uptime_sensor
+    update_interval: 60s
+    on_raw_value:
+      then:
+        - text_sensor.template.publish:
+            id: uptime_human
+            state: !lambda |-
+              int seconds = round(id(uptime_sensor).raw_state);
+              int days = seconds / (24 * 3600);
+              seconds = seconds % (24 * 3600);
+              int hours = seconds / 3600;
+              seconds = seconds % 3600;
+              int minutes = seconds /  60;
+              seconds = seconds % 60;
+              return (
+                (days ? to_string(days) + "d " : "") +
+                (hours ? to_string(hours) + "h " : "") +
+                (minutes ? to_string(minutes) + "m " : "") +
+                (to_string(seconds) + "s")
+              ).c_str();
