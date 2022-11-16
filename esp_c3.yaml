@@ -27,6 +27,7 @@ ota:
 wifi:
   ssid: !secret wifi_iot_ssid
   password: !secret wifi_iot_password
+  use_address: 192.168.8.166
   output_power: "8.5"
 
 
@@ -46,22 +47,100 @@ light:
 i2c:
   sda: 8
   scl: 10
+
+uart:
+  tx_pin: 21
+  rx_pin: 20
+  baud_rate: 9600
+
+spi:
+  clk_pin: 2  # D5
+  mosi_pin: 4  # D7
+  miso_pin: 3  # D6
+
 font:
   - file: "font/monofont.ttf"
     id: opensans
-    size: 12
+    size: 32
+    glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
+  - file: "font/Inconsolata-SemiCondensedLight.ttf"
+    id: labels
+    size: 19
+    glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
+  - file: "font/Inconsolata-ExtraCondensedBold.ttf"
+    id: big_chars
+    size: 55
+    glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
+  - file: "font/Inconsolata-ExtraCondensedExtraBold.ttf"
+    id: small_chars
+    size: 19
+    glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
+  - file: "font/Inconsolata-SemiCondensedLight.ttf"
+    id: labels_small
+    size: 14
+    glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ"
+
 
 display:
-  - platform: ssd1306_i2c
-    id: oled
-    model: "SSD1306 128x32"
+  - platform: waveshare_epaper
+    cs_pin: 1  # D0
+    dc_pin: 5  # D8
+    # busy_pin: 7 # D3 TS_CS
+    # reset_pin: D5
+    full_update_every: 300
+    update_interval: 5s
+    model: 1.54in
+    # full_update_every: 30
     pages:
       - id: page1
         lambda: |-
-          it.printf(0, 0, id(opensans), "Hum.ty: %.1f \%", id(humidity).state);
-          it.printf(0, 11, id(opensans), "Temp: %.2f°C", id(temp).state);
-          it.printf(0, 22, id(opensans), "Illum: %.1f", id(illuminance).state);
+          it.print(120, 0, id(labels), TextAlign::TOP_RIGHT, "Temperature");
+          it.printf(120, 10, id(big_chars), TextAlign::TOP_RIGHT, "%.1f°C", id(temp).state);
+          it.print(120, 70, id(labels), TextAlign::TOP_RIGHT, "Humidity");
+          it.printf(120, 80, id(big_chars), TextAlign::TOP_RIGHT, "%.1f %%", id(humidity).state);
+
+          it.print(130,  0 * (10.0 + 22)      + 0 * 5, id(labels_small), "Light");
+          it.printf(130, 0 * (10.0 + 22) + 12 + 0 * 5, id(small_chars), "%.1f lux", id(illuminance).state);
+          it.print(130,  1 * (10.0 + 22)      + 1 * 5, id(labels_small), "TVOC");
+          it.printf(130, 1 * (10.0 + 22) + 12 + 1 * 5, id(small_chars), "%.1f ppb", id(tvoc).state);
+          it.print(130,  2 * (10.0 + 22)      + 1 * 5, id(labels_small), "eCO2");
+          it.printf(130, 2 * (10.0 + 22) + 12 + 1 * 5, id(small_chars), "%.1f ppm", id(eco2).state);
+
+          it.print(130,  3 * (10.0 + 22)      + 2 * 5, id(labels_small), "PM<2.5µm");
+          it.printf(130, 3 * (10.0 + 22) + 12 + 2 * 5, id(small_chars), "%.1fµg/m³", id(pm_2_5).state);
+          it.print(130,  4 * (10.0 + 22)      + 2 * 5, id(labels_small), "PM<10.0µm");
+          it.printf(130, 4 * (10.0 + 22) + 12 + 2 * 5, id(small_chars), "%.1fµg/m³", id(pm_10_0).state);
+
+          it.printf(0, 200, id(labels_small), TextAlign::BOTTOM_LEFT, "Uptime %s", id(uptime_human).state.c_str() );
+          it.printf(200, 200, id(labels_small), TextAlign::BOTTOM_RIGHT, "%.1fdBm", id(wifi_rssi).state);
+
 sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor"
+    update_interval: 15s
+    filters:
+      - sliding_window_moving_average:
+          window_size: 4
+          send_every: 2
+    id: wifi_rssi
+
+  - platform: sds011
+    pm_2_5:
+      name: "Particulate Matter <2.5µm Concentration"
+      id: pm_2_5
+      filters:
+      - sliding_window_moving_average:
+          window_size: 5
+          send_every: 1
+    pm_10_0:
+      name: "Particulate Matter <10.0µm Concentration"
+      id: pm_10_0
+      filters:
+      - sliding_window_moving_average:
+          window_size: 5
+          send_every: 1
+    update_interval: 5min
+
   - platform: sht3xd
     temperature:
       id: temp
@@ -88,7 +167,7 @@ sensor:
   - platform: uptime
     name: Uptime Sensor
     id: uptime_sensor
-    update_interval: 60s
+    update_interval: 5s
     on_raw_value:
       then:
         - text_sensor.template.publish:
@@ -107,6 +186,37 @@ sensor:
                 (minutes ? to_string(minutes) + "m " : "") +
                 (to_string(seconds) + "s")
               ).c_str();
+  - platform: sgp30
+    eco2:
+      name: "eCO2"
+      accuracy_decimals: 1
+      id: eco2
+      filters:
+        - sliding_window_moving_average:
+            window_size: 60
+            send_every: 30
+    tvoc:
+      name: "TVOC"
+      accuracy_decimals: 1
+      id: tvoc
+      filters:
+        - sliding_window_moving_average:
+            window_size: 60
+            send_every: 30
+    # 19/11/2021 0x9463, TVOC baseline: 0x93BE
+    # 20/11/2021 0x9301, TVOC baseline: 0x94BC
+    # 19/01/2022 eCO2 0x8FBD, TVOC baseline: 0x94EE
+    # 29/08/2022 eCO2 0x8DE9, TVOC baseline: 0x9207
+    baseline:
+      eco2_baseline: 0x8DE9
+      tvoc_baseline: 0x9207
+    store_baseline: true
+    address: 0x58
+    update_interval: 1s
+    compensation:
+      temperature_source: temp
+      humidity_source: humidity
+
 text_sensor:
   - platform: template
     name: Uptime Human Readable
