@@ -47,6 +47,7 @@ light:
 i2c:
   sda: 8
   scl: 10
+  frequency: 50kHz
 
 uart:
   tx_pin: 21
