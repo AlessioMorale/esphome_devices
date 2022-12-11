@@ -60,25 +60,25 @@ spi:
   miso_pin: 3  # D6
 
 font:
-  - file: "font/monofont.ttf"
-    id: opensans
-    size: 32
-    glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
-  - file: "font/Inconsolata-SemiCondensedLight.ttf"
+  - file: "font/Sono/static/Sono/Sono-Light.ttf"
     id: labels
-    size: 19
+    size: 15
     glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
-  - file: "font/Inconsolata-ExtraCondensedBold.ttf"
+  - file: "font/Open_Sans/static/OpenSans_Condensed/OpenSans_Condensed-Bold.ttf"
     id: big_chars
-    size: 55
+    size: 60
     glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
-  - file: "font/Inconsolata-ExtraCondensedExtraBold.ttf"
+  - file: "font/Open_Sans/static/OpenSans_Condensed/OpenSans_Condensed-Bold.ttf"
+    id: big_labels
+    size: 30
+    glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
+  - file: "font/Sono/static/Sono/Sono-Light.ttf"
     id: small_chars
-    size: 19
-    glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
-  - file: "font/Inconsolata-SemiCondensedLight.ttf"
-    id: labels_small
     size: 14
+    glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
+  - file: "font/slkscr.ttf"
+    id: labels_small
+    size: 8
     glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ"
 
 
@@ -95,22 +95,25 @@ display:
     pages:
       - id: page1
         lambda: |-
-          it.print(120, 0, id(labels), TextAlign::TOP_RIGHT, "Temperature");
-          it.printf(120, 10, id(big_chars), TextAlign::TOP_RIGHT, "%.1f°C", id(temp).state);
-          it.print(120, 70, id(labels), TextAlign::TOP_RIGHT, "Humidity");
-          it.printf(120, 80, id(big_chars), TextAlign::TOP_RIGHT, "%.1f %%", id(humidity).state);
+          it.print(120, 0, id(labels_small), TextAlign::TOP_RIGHT, "Temperature");
+          it.printf(100, 68, id(big_chars), TextAlign::BOTTOM_RIGHT, "%.1f", id(temp).state);
+          it.print(100, 58, id(big_labels), TextAlign::BOTTOM_LEFT, "°C");
 
-          it.print(130,  0 * (10.0 + 22)      + 0 * 5, id(labels_small), "Light");
-          it.printf(130, 0 * (10.0 + 22) + 12 + 0 * 5, id(small_chars), "%.1f lux", id(illuminance).state);
-          it.print(130,  1 * (10.0 + 22)      + 1 * 5, id(labels_small), "TVOC");
-          it.printf(130, 1 * (10.0 + 22) + 12 + 1 * 5, id(small_chars), "%.1f ppb", id(tvoc).state);
-          it.print(130,  2 * (10.0 + 22)      + 1 * 5, id(labels_small), "eCO2");
-          it.printf(130, 2 * (10.0 + 22) + 12 + 1 * 5, id(small_chars), "%.1f ppm", id(eco2).state);
+          it.print(120, 70, id(labels_small), TextAlign::TOP_RIGHT, "Humidity");
+          it.printf(100,148, id(big_chars), TextAlign::BOTTOM_RIGHT, "%.1f", id(humidity).state);
+          it.print(100, 138, id(big_labels), TextAlign::BOTTOM_LEFT, "%");
 
-          it.print(130,  3 * (10.0 + 22)      + 2 * 5, id(labels_small), "PM<2.5µm");
-          it.printf(130, 3 * (10.0 + 22) + 12 + 2 * 5, id(small_chars), "%.1fµg/m³", id(pm_2_5).state);
-          it.print(130,  4 * (10.0 + 22)      + 2 * 5, id(labels_small), "PM<10.0µm");
-          it.printf(130, 4 * (10.0 + 22) + 12 + 2 * 5, id(small_chars), "%.1fµg/m³", id(pm_10_0).state);
+          it.print(130,  0 * (10.0 + 18)      + 0 * 5, id(labels_small), "- Light");
+          it.printf(130, 0 * (10.0 + 18) + 9 + 0 * 5, id(small_chars), "%.1f lux", id(illuminance).state);
+          it.print(130,  1 * (10.0 + 18)      + 1 * 5, id(labels_small), "- TVOC");
+          it.printf(130, 1 * (10.0 + 18) + 9 + 1 * 5, id(small_chars), "%.1f ppb", id(tvoc).state);
+          it.print(130,  2 * (10.0 + 18)      + 1 * 5, id(labels_small), "- eCO2");
+          it.printf(130, 2 * (10.0 + 18) + 9 + 1 * 5, id(small_chars), "%.1f ppm", id(eco2).state);
+
+          it.print(130,  3 * (10.0 + 18)      + 2 * 5, id(labels_small), "- PM<2.5um");
+          it.printf(130, 3 * (10.0 + 18) + 9 + 2 * 5, id(small_chars), "%.1fµg/m³", id(pm_2_5).state);
+          it.print(130,  4 * (10.0 + 18)      + 2 * 5, id(labels_small), "- PM<10.0um");
+          it.printf(130, 4 * (10.0 + 18) + 9 + 2 * 5, id(small_chars), "%.1fµg/m³", id(pm_10_0).state);
 
           it.printf(0, 200, id(labels_small), TextAlign::BOTTOM_LEFT, "Uptime %s", id(uptime_human).state.c_str() );
           it.printf(200, 200, id(labels_small), TextAlign::BOTTOM_RIGHT, "%.1fdBm", id(wifi_rssi).state);
