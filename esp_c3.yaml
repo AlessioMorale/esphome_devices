@@ -25,8 +25,8 @@ bluetooth_proxy:
 
 ota:
 
-# logger:
-#  baud_rate: 0
+logger:
+  baud_rate: 0
 
 web_server:
  port: 80
@@ -104,6 +104,7 @@ display:
     update_interval: 5s
     model: 1.54in
     # full_update_every: 30
+    rotation: 180
     pages:
       - id: page1
         lambda: |-
