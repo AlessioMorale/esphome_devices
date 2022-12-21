@@ -20,10 +20,23 @@ esp32:
 # Enable Home Assistant API
 api:
 
+bluetooth_proxy:
+  active: true
+
 ota:
 
-# web_server:
-#  port: 80
+# logger:
+#  baud_rate: 0
+
+web_server:
+ port: 80
+external_components:
+  - source: github://dentra/esphome-components
+backup:
+  auth:
+    username: !secret web_username
+    password: !secret web_password
+  force_update: false
 
 wifi:
   ssid: !secret wifi_iot_ssid
@@ -31,15 +44,13 @@ wifi:
   use_address: 192.168.8.166
   output_power: "8.5"
 
-
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: $name
     password: $name
 
-# captive_portal:
+captive_portal:
 
-# Example configuration entry
 light:
   - platform: status_led
     name: "Switch state"
@@ -119,6 +130,9 @@ display:
           it.printf(0, 200, id(labels_small), TextAlign::BOTTOM_LEFT, "Uptime %s", id(uptime_human).state.c_str() );
           it.printf(200, 200, id(labels_small), TextAlign::BOTTOM_RIGHT, "%.1fdBm", id(wifi_rssi).state);
 
+time:
+  - platform: sntp
+    id: sntp_time
 sensor:
   - platform: wifi_signal
     name: "WiFi Signal Sensor"
@@ -172,7 +186,7 @@ sensor:
   - platform: uptime
     name: Uptime Sensor
     id: uptime_sensor
-    update_interval: 5s
+    update_interval: 10s
     on_raw_value:
       then:
         - text_sensor.template.publish:
