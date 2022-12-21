@@ -3,18 +3,19 @@ substitutions:
 esphome:
   name: $name
   platformio_options:
-    board_build.flash_mode: dio  
-esp32:
-  board: esp32-c3-devkitm-1
-  variant: ESP32C3
-  framework:
-    type: esp-idf
-    sdkconfig_options:
-      CONFIG_ESP_CONSOLE_USB_CDC: y
+    board_build.f_flash: 40000000L
+    board_build.flash_mode: dio
+    board_build.flash_size: 4MB
+    board_build.variant: esp32c3
 
-# Enable logging
-logger:
-  hardware_uart: USB_SERIAL_JTAG
+esp32:
+  #board: lolin_c3_mini
+  board: esp32-c3-devkitm-1
+  variant: esp32c3
+  framework:
+    type: arduino
+    version: 2.0.5
+    platform_version: 5.2.0
 
 # Enable Home Assistant API
 api:
