@@ -14,8 +14,8 @@ esp32:
   variant: esp32c3
   framework:
     type: arduino
-    version: 2.0.5
-    platform_version: 5.2.0
+#    version: 2.0.5
+#    platform_version: 5.2.0
 
 # Enable Home Assistant API
 api:
@@ -86,11 +86,11 @@ font:
     glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
   - file: "font/Sono/static/Sono/Sono-Light.ttf"
     id: small_chars
-    size: 14
+    size: 15
     glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
   - file: "font/slkscr.ttf"
     id: labels_small
-    size: 8
+    size: 10
     glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ"
 
 
@@ -128,8 +128,9 @@ display:
           it.print(130,  4 * (10.0 + 18)      + 2 * 5, id(labels_small), "- PM<10.0um");
           it.printf(130, 4 * (10.0 + 18) + 9 + 2 * 5, id(small_chars), "%.1fµg/m³", id(pm_10_0).state);
 
-          it.printf(0, 200, id(labels_small), TextAlign::BOTTOM_LEFT, "Uptime %s", id(uptime_human).state.c_str() );
-          it.printf(200, 200, id(labels_small), TextAlign::BOTTOM_RIGHT, "%.1fdBm", id(wifi_rssi).state);
+          it.printf(0, 200, id(small_chars), TextAlign::BOTTOM_LEFT, "Up %s", id(uptime_human).state.c_str() );
+          it.printf(60, 200 , id(small_chars), TextAlign::BOTTOM_LEFT, "%s", id(wifi_ip).state.c_str() );
+          it.printf(200, 200, id(small_chars), TextAlign::BOTTOM_RIGHT, "%.1fdBm", id(wifi_rssi).state);
 
 time:
   - platform: sntp
@@ -223,13 +224,15 @@ sensor:
         - sliding_window_moving_average:
             window_size: 60
             send_every: 30
-    # 19/11/2021 0x9463, TVOC baseline: 0x93BE
-    # 20/11/2021 0x9301, TVOC baseline: 0x94BC
-    # 19/01/2022 eCO2 0x8FBD, TVOC baseline: 0x94EE
-    # 29/08/2022 eCO2 0x8DE9, TVOC baseline: 0x9207
+    # 19/11/2021 eCO2 0x9463, TVOC 0x93BE
+    # 20/11/2021 eCO2 0x9301, TVOC 0x94BC
+    # 19/01/2022 eCO2 0x8FBD, TVOC 0x94EE
+    # 29/08/2022 eCO2 0x8DE9, TVOC 0x9207
+    # 23/12/2022 eCO2 0x9111, TVOC 0x930B
+    # 02/02/2023 eCO2 0x8F32, TVOC 0x9470
     baseline:
-      eco2_baseline: 0x8DE9
-      tvoc_baseline: 0x9207
+      eco2_baseline: 0x8F32
+      tvoc_baseline: 0x9470
     store_baseline: true
     address: 0x58
     update_interval: 1s
@@ -242,3 +245,7 @@ text_sensor:
     name: Uptime Human Readable
     id: uptime_human
     icon: mdi:clock-start
+  - platform: wifi_info
+    ip_address:
+      name: wifi_ip
+      id: wifi_ip
