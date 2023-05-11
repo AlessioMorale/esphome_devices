@@ -1,0 +1,8 @@
+---
+sensor:
+  - platform: aht10
+    temperature:
+      name: "Air temperature"
+    humidity:
+      name: "Air humidity"
+    update_interval: 15s

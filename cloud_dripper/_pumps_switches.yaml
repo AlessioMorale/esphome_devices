@@ -1,0 +1,17 @@
+---
+.x_base_pump: &base_pump
+  platform: gpio
+
+switch:
+  - <<: *base_pump
+    pin: ${gpio_pump_1}
+    id: pump_1
+    name: "Pump 1"
+  - <<: *base_pump
+    pin: ${gpio_pump_2}
+    id: pump_2
+    name: "Pump 2"
+  - <<: *base_pump
+    pin: ${gpio_pump_3}
+    id: pump_3
+    name: "Pump 3"

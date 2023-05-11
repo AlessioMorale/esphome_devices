@@ -1,0 +1,10 @@
+substitutions:
+  gpio_pump_1: "5"
+  gpio_pump_2: "10"
+  gpio_pump_3: "0"
+  gpio_leds: "4"
+  gpio_sense_1: "6"
+  gpio_sense_2: "4"
+  gpio_sense_3: "1"
+  gpio_scl: "8"
+  gpio_sda: "7"
