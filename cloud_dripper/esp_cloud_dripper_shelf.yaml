@@ -1,0 +1,54 @@
+substitutions:
+  name: clouddrip
+  ip: clouddrip-293a7c.local 
+  #ip: 192.168.8.179 #192.168.8.178
+
+packages:
+  pinout: !include _pinout.yaml
+  humidity_sensor1: !include 
+    file: _humidity_sensor.yaml
+    vars: 
+      id: 1
+      pin: ${gpio_sense_1}
+  humidity_sensor2: !include
+    file: _humidity_sensor.yaml
+    vars:
+      id: 2
+      pin: ${gpio_sense_2}
+  humidity_sensor3: !include
+    file: _humidity_sensor.yaml
+    vars:
+      id: 3
+      pin: ${gpio_sense_3}
+  leds: !include _leds.yaml
+  system: !include _system_base.yaml
+  pumps: !include _pumps_switches.yaml
+  additiona_sensors: !include _additional_sensors.yaml
+  settings: !include _configurable_settings.yaml
+  sprinklers: !include _sprinklers.yaml
+
+
+font:
+  - file: "../font/nerd_fonts/ProggyCleanCENerdFontMono-Regular.ttf"
+    id: gliphs
+    size: 34
+    glyphs: "󰓾󰧱"
+  - file: "../font/Sono/static/Sono/Sono-Regular.ttf"
+    id: labels
+    glyphs: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- .,:&|/°%"
+    size: 14
+  - file: "../font/Sono/static/Sono/Sono-Regular.ttf"
+    id: font_standard
+    glyphs: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- .,:&|/°%"
+    size: 12
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x32"
+    lambda: |-
+      it.print(0, 8, id(gliphs), TextAlign::CENTER_LEFT, u8"");
+      it.print(18, 0, id(labels), u8"CloudDripper");
+
+      it.print(0, 18 + 5, id(gliphs), TextAlign::CENTER_LEFT, u8"");
+      it.printf(25, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_1).state); 
+      it.printf(55, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_2).state); 
+      it.printf(85, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_3).state);

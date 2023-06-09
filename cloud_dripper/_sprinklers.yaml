@@ -1,49 +1,12 @@
-substitutions:
-  name: clouddrip
-  ip: clouddrip-293a7c.local 
-  #ip: 192.168.8.179 #192.168.8.178
-
-packages:
-  pinout: !include _pinout.yaml
-  humidity_sensor1: !include 
-    file: _humidity_sensor.yaml
-    vars: 
-      id: 1
-      pin: ${gpio_sense_1}
-  humidity_sensor2: !include
-    file: _humidity_sensor.yaml
-    vars:
-      id: 2
-      pin: ${gpio_sense_2}
-  humidity_sensor3: !include
-    file: _humidity_sensor.yaml
-    vars:
-      id: 3
-      pin: ${gpio_sense_3}
-  leds: !include _leds.yaml
-  system: !include _system_base.yaml
-  pumps: !include _pumps_switches.yaml
-  additiona_sensors: !include _additional_sensors.yaml
-  settings: !include _configurable_settings.yaml
-
-font:
-  - file: "../font/Sono/static/Sono/Sono-Light.ttf"
-    id: labels
-    size: 12
-display:
-  - platform: ssd1306_i2c
-    model: "SSD1306 128x64"
-    lambda: |-
-      it.print(0, 0, id(labels), "CloudDripper!");
-
+---
 sprinkler:
   - id: sprinkler_ctrlr
     main_switch: "Enable sprinklers"
-    auto_advance_switch: "Sprinklers Auto Advance"
+    auto_advance_switch: "_advance"
     valve_open_delay: 1s
     valves:
       - valve_switch: "pump_1"
-        enable_switch: "Enable pump_1"
+        #enable_switch: "Enable pump_1"
         valve_switch_id: pump_1
 #        run_duration: 5s
         run_duration_number:
@@ -57,7 +20,7 @@ sprinkler:
           icon: "mdi:timer-outline"
           mode: slider 
       - valve_switch: "pump_2"
-        enable_switch: "Enable pump_2"
+        #enable_switch: "Enable pump_2"
         valve_switch_id: pump_2
         run_duration_number:
           id: valve_duration_2
@@ -70,7 +33,7 @@ sprinkler:
           icon: "mdi:timer-outline"
           mode: slider 
       - valve_switch: "pump_3"
-        enable_switch: "Enable pump_3"
+        #enable_switch: "Enable pump_3"
         valve_switch_id: pump_3
         run_duration_number:
           id: valve_duration_3
@@ -86,13 +49,14 @@ time:
   - platform: sntp
     on_time:
       # Every 5 minutes
-      - seconds: 0
-        minutes: /5
+      - hours: 9, 14, 20
+        minutes: 0, 5, 10
+        seconds: 0
         then:
             - sprinkler.clear_queued_valves: sprinkler_ctrlr
             - if:
                 condition:
-                  lambda: 'return id(humidity_1).state < id(target_humidity_1).state;'
+                  lambda: 'return id(humidity_1).state < 90;'
                 then:
                   - logger.log: "queuing pump_0"
                   - sprinkler.queue_valve:
@@ -101,7 +65,7 @@ time:
                       run_duration: 0s
             - if:
                 condition:
-                  lambda: 'return id(humidity_2).state < id(target_humidity_2).state;'
+                  lambda: 'return id(humidity_2).state < 90;'
                 then:
                   - logger.log: "queuing pump_1"
                   - sprinkler.queue_valve:
@@ -110,7 +74,7 @@ time:
                       run_duration: 0s
             - if:
                 condition:
-                  lambda: 'return id(humidity_3).state < id(target_humidity_3).state;'
+                  lambda: 'return id(humidity_3).state < 90;'
                 then:
                   - logger.log: "queuing pump_2"
                   - sprinkler.queue_valve:

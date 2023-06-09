@@ -72,13 +72,22 @@ spi:
   miso_pin: 3  # D6
 
 font:
-  - file: "font/Sono/static/Sono/Sono-Light.ttf"
-    id: labels
-    size: 15
-    glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
+  - file: "font/nerd_fonts/ProggyCleanCENerdFontMono-Regular.ttf"
+    id: big_gliphs
+    size: 50
+    glyphs: "󰖎󱡕󰔄󰟤󱫡󱩅󰖩󰀂"
+  - file: "font/nerd_fonts/ProggyCleanCENerdFontMono-Regular.ttf"
+    id: mid_gliphs
+    size: 35
+    glyphs: "󰖎󱡕󰔄󰟤󱫡󱩅󰖩󰀂"
+  - file: "font/nerd_fonts/ProggyCleanCENerdFontMono-Regular.ttf"
+    id: small_gliphs
+    size: 25
+    glyphs: "󰖎󱡕󰔄󰟤󱫡󱩅󰖩󰀂"
+
   - file: "font/Open_Sans/static/OpenSans_Condensed/OpenSans_Condensed-Bold.ttf"
     id: big_chars
-    size: 60
+    size: 50
     glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ/³"
   - file: "font/Open_Sans/static/OpenSans_Condensed/OpenSans_Condensed-Bold.ttf"
     id: big_labels
@@ -108,29 +117,34 @@ display:
     pages:
       - id: page1
         lambda: |-
-          it.print(120, 0, id(labels_small), TextAlign::TOP_RIGHT, "Temperature");
-          it.printf(100, 68, id(big_chars), TextAlign::BOTTOM_RIGHT, "%.1f", id(temp).state);
-          it.print(100, 58, id(big_labels), TextAlign::BOTTOM_LEFT, "°C");
+          it.print(0, 18, id(mid_gliphs), TextAlign::CENTER_LEFT, u8"");
+          it.printf(98, 58, id(big_chars), TextAlign::BOTTOM_RIGHT, "%.1f", id(temp).state);
+          it.print(98, 48, id(mid_gliphs), TextAlign::BOTTOM_LEFT, u8"󰔄");
 
-          it.print(120, 70, id(labels_small), TextAlign::TOP_RIGHT, "Humidity");
-          it.printf(100,148, id(big_chars), TextAlign::BOTTOM_RIGHT, "%.1f", id(humidity).state);
-          it.print(100, 138, id(big_labels), TextAlign::BOTTOM_LEFT, "%");
+          it.print(0, 70, id(mid_gliphs), TextAlign::CENTER_LEFT, u8"󱡕");
+          it.printf(98,110, id(big_chars), TextAlign::BOTTOM_RIGHT, "%.1f", id(humidity).state);
+          it.print(98, 100, id(mid_gliphs), TextAlign::BOTTOM_LEFT, u8"");
 
-          it.print(130,  0 * (10.0 + 18)      + 0 * 5, id(labels_small), "- Light");
-          it.printf(130, 0 * (10.0 + 18) + 9 + 0 * 5, id(small_chars), "%.1f lux", id(illuminance).state);
-          it.print(130,  1 * (10.0 + 18)      + 1 * 5, id(labels_small), "- TVOC");
-          it.printf(130, 1 * (10.0 + 18) + 9 + 1 * 5, id(small_chars), "%.1f ppb", id(tvoc).state);
-          it.print(130,  2 * (10.0 + 18)      + 1 * 5, id(labels_small), "- eCO2");
-          it.printf(130, 2 * (10.0 + 18) + 9 + 1 * 5, id(small_chars), "%.1f ppm", id(eco2).state);
+          it.print (130, 0 * 18 + 10, id(small_gliphs), TextAlign::CENTER_RIGHT, u8"");
+          it.printf(199, 0 * 18, id(small_chars), TextAlign::RIGHT, "%.1f lux", id(illuminance).state);
+          
+          it.print (130, 1 * 18 + 10, id(small_gliphs), TextAlign::CENTER_RIGHT, u8"󱩅");
+          it.printf(199, 1 * 18, id(small_chars), TextAlign::RIGHT, "%.1f ppb", id(tvoc).state);
+
+          it.print (130, 2 * 18 + 10, id(small_gliphs), TextAlign::CENTER_RIGHT, u8"󰟤");
+          it.printf(199, 2 * 18, id(small_chars), TextAlign::RIGHT, "%.1f ppm", id(eco2).state);
 
           it.print(130,  3 * (10.0 + 18)      + 2 * 5, id(labels_small), "- PM<2.5um");
           it.printf(130, 3 * (10.0 + 18) + 9 + 2 * 5, id(small_chars), "%.1fµg/m³", id(pm_2_5).state);
           it.print(130,  4 * (10.0 + 18)      + 2 * 5, id(labels_small), "- PM<10.0um");
           it.printf(130, 4 * (10.0 + 18) + 9 + 2 * 5, id(small_chars), "%.1fµg/m³", id(pm_10_0).state);
 
-          it.printf(0, 200, id(small_chars), TextAlign::BOTTOM_LEFT, "Up %s", id(uptime_human).state.c_str() );
-          it.printf(60, 200 , id(small_chars), TextAlign::BOTTOM_LEFT, "%s", id(wifi_ip).state.c_str() );
-          it.printf(200, 200, id(small_chars), TextAlign::BOTTOM_RIGHT, "%.1fdBm", id(wifi_rssi).state);
+          it.print (13, 170, id(small_gliphs), TextAlign::CENTER_RIGHT, u8"󱫡");
+          it.printf(14, 180, id(small_chars), TextAlign::BOTTOM_LEFT, "%s", id(uptime_human).state.c_str() );
+          it.print (13, 190, id(small_gliphs), TextAlign::CENTER_RIGHT, u8"󰀂");
+          it.printf(14, 200 , id(small_chars), TextAlign::BOTTOM_LEFT, "%s", id(wifi_ip).state.c_str() );
+          it.print (154, 190, id(small_gliphs), TextAlign::CENTER_RIGHT, u8"󰖩");
+          it.printf(156, 200, id(small_chars), TextAlign::BOTTOM_LEFT, "%.1fdBm", id(wifi_rssi).state);
 
 time:
   - platform: sntp

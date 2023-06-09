@@ -1,0 +1,68 @@
+substitutions:
+  name: clouddrip
+  ip: clouddrip-27be74.local
+
+packages:
+  pinout: !include _pinout.yaml
+  humidity_sensor1: !include 
+    file: _humidity_sensor.yaml
+    vars: 
+      id: 1
+      pin: ${gpio_sense_1}
+  humidity_sensor2: !include
+    file: _humidity_sensor.yaml
+    vars:
+      id: 2
+      pin: ${gpio_sense_2}
+  humidity_sensor3: !include
+    file: _humidity_sensor.yaml
+    vars:
+      id: 3
+      pin: ${gpio_sense_3}
+  leds: !include _leds.yaml
+  sprinklers: !include _sprinklers.yaml
+  system: !include _system_base.yaml
+  pumps: !include _pumps_switches.yaml
+  additiona_sensors: !include _additional_sensors.yaml
+  settings: !include _configurable_settings.yaml
+
+font:
+  - file: "../font/nerd_fonts/ProggyCleanCENerdFontMono-Regular.ttf"
+    id: gliphs
+    size: 34
+    glyphs: "󰓾󰧱"
+  - file: "../font/Sono/static/Sono/Sono-Regular.ttf"
+    id: labels
+    glyphs: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- .,:&|/°%"
+    size: 14
+  - file: "../font/Sono/static/Sono/Sono-Regular.ttf"
+    id: font_standard
+    glyphs: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- .,:&|/°%"
+    size: 12
+  - file: "../font/slkscr.ttf"
+    id: font_small
+    glyphs: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- .,:&|/°%"
+    size: 8
+  - file: "../font/nerd_fonts/ProggyCleanCENerdFontMono-Regular.ttf"
+    id: small_gliphs
+    size: 18
+    glyphs: "󰖎󱡕󰔄󰟤󱫡󱩅󰖩󰀂"
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    lambda: |-
+      it.print(0, 8, id(gliphs), TextAlign::CENTER_LEFT, u8"");
+      it.print(18, 0, id(labels), u8"CloudDripper");
+
+      it.print(0, 18 + 5, id(gliphs), TextAlign::CENTER_LEFT, u8"");
+      it.printf(25, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_1).state); 
+      it.printf(55, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_2).state); 
+      it.printf(85, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_3).state);
+
+      it.print (13, 51 - 5, id(small_gliphs), TextAlign::CENTER_RIGHT, u8"󱫡");
+      it.printf(16, 51, id(font_small), TextAlign::BOTTOM_LEFT, "%s", id(uptime_human).state.c_str() );
+      it.print (90, 51 - 5, id(small_gliphs), TextAlign::CENTER_RIGHT, u8"󰖩");
+      it.printf(90, 51, id(font_small), TextAlign::BOTTOM_LEFT, "%.0fdBm", id(wifi_rssi).state);
+      it.print (13, 64 - 5, id(small_gliphs), TextAlign::CENTER_RIGHT, u8"󰀂");
+      it.printf(16, 64 , id(font_small), TextAlign::BOTTOM_LEFT, "%s", id(wifi_ip).state.c_str() );
+      
