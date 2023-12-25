@@ -1,48 +1,29 @@
 ---
-.x_base_sensor: &base_sensor
-  platform: pulse_meter
-  accuracy_decimals: 4
-  unit_of_measurement: 'Hz'
-  filters:
-  - multiply: 0.016666667
-  - sliding_window_moving_average:
-      window_size: 30
-      send_every: 10
-.x-humid-calibration-number-template: &humidity_calibration_number_template
-    platform: template
-    # Optional variables:
-    unit_of_measurement: "Hz"
-    optimistic: true
-    min_value: 0
-    max_value: 30
-    step: 0.05
-    restore_value: true
-
 sensor:
-- <<: *base_sensor
-  name: sensor_${id}
+- name: sensor_${id}
   pin:
     number: ${pin}
     mode:
       input: true
       pulldown: true
   id: sense_${id}
-- platform: template
-  name: "Soil Humidity ${id} %"
-  id: humidity_${id}
-  update_interval: 30s
-  lambda: |-
-    return 100.0f - (id(sense_${id}).state - id(calibration_min_humidity_${id}).state)/id(calibration_max_humidity_${id}).state * 100.0f;
+  platform: pulse_meter
+  accuracy_decimals: 2
+  unit_of_measurement: 'Hz'
+  timeout: 5s
+  filters:
+  - multiply: 0.016666667
+  - sliding_window_moving_average:
+      window_size: 30
+      send_every: 10
 
-number:
-  - <<: *humidity_calibration_number_template
-    name: Calibration Humidity wet ${id}
-    id: calibration_min_humidity_${id}
-    icon: "mdi:water-plus"
-    initial_value: 3
-
-  - <<: *humidity_calibration_number_template
-    icon: "mdi:water-minus" #mdi:water-plus
-    name: Calibration Humidity dry ${id}
-    id: calibration_max_humidity_${id}
-    initial_value: 25
+humidity_sensor:
+  - id: humidity_${id}
+    name: Humidity sensor ${id}
+    calibration_dry:
+      id: calibration_max_humidity_${id}
+      name: Calibration dry ${id}
+    calibration_wet:
+      id: calibration_min_humidity_${id}
+      name: Calibration Wet ${id}
+    input: sense_${id}
