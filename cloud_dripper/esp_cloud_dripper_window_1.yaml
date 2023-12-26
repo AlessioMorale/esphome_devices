@@ -1,6 +1,8 @@
 substitutions:
   name: clouddrip
   ip: clouddrip-27be74.local
+  filename: cloud_dripper/esp_cloud_dripper_window_1.yaml
+
 
 packages:
   pinout: !include _pinout.yaml

@@ -2,6 +2,7 @@ substitutions:
   name: clouddrip
   ip: clouddrip-293a7c.local 
   #ip: 192.168.8.179 #192.168.8.178
+  filename: cloud_dripper/esp_cloud_dripper_shelf.yaml
 
 packages:
   pinout: !include _pinout.yaml
