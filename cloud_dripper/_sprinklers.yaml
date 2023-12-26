@@ -2,7 +2,10 @@
 sprinkler:
   - id: sprinkler_ctrlr
     main_switch: "Enable sprinklers"
-    auto_advance_switch: "_advance"
+    auto_advance_switch:
+      id: "_advance"
+      name: "advance"
+      internal: true
     valve_open_delay: 1s
     valves:
       - valve_switch: "pump_1"

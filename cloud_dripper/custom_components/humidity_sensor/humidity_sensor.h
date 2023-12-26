@@ -24,6 +24,7 @@ class HumiditySensor : public Component, public sensor::Sensor {
   void set_calibration_dry(PersistentNumber *calibration_dry) { this->calibration_dry_ = calibration_dry; }
   void set_calibration_wet(PersistentNumber *calibration_wet) { this->calibration_wet_ = calibration_wet; }
   void set_wait_time(uint32_t value) { this->wait_time_ = value; }
+  void set_timeout(uint32_t value) { this->timeout_ = value; }
 
  protected:
   // input sensors
@@ -35,11 +36,14 @@ class HumiditySensor : public Component, public sensor::Sensor {
   float get_calibration_dry() { return this->calibration_dry_->state; }
   float get_calibration_wet() { return this->calibration_wet_->state; }
 
-  void process_input(float frequency, float calibration_dry, float calibration_wet);
+  void check_timeout();
+  void process_input(float frequency);
   float calc_humidity(float frequency, float calibration_dry, float calibration_wet);
 
   uint32_t wait_start_{0};
   uint32_t wait_time_{0};
+  uint32_t timeout_{0};
+  uint32_t timeout_start_{0};
 };
 
 }  // namespace humidity_sensor

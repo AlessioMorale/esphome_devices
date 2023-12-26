@@ -28,23 +28,48 @@ void HumiditySensor::setup() {
     };
     this->input_->add_on_state_callback(cb);
   }
+  this->publish_state(NAN);
 }
 
 void HumiditySensor::loop() {
   if (this->wait_start_ && (millis() - this->wait_start_) > this->wait_time_) {
     this->wait_start_ = 0;
     auto state = this->get_input();
-    auto calibration_dry = this->get_calibration_dry();
-    auto calibration_wet = this->get_calibration_wet();
-    this->process_input(state, calibration_dry, calibration_wet);
+    this->process_input(state);
+    this->timeout_start_ = 0;
+    return;
+  }
+  check_timeout();
+}
+
+void HumiditySensor::check_timeout(){
+  if (!this->timeout_start_)
+  {
+    this->timeout_start_ = millis();
+  }
+  if (this->timeout_start_ && (millis() - this->timeout_start_) > this->timeout_) {
+    ESP_LOGW(TAG, "[%s] Timeout waiting for sensor input [%s]", this->get_name().c_str(), this->input_->get_name().c_str());
+
+    this->timeout_start_ = 0;
+    this->process_input(NAN);
   }
 }
 
 // calculates humidity
-void HumiditySensor::process_input(float frequency, float calibration_dry, float calibration_wet) {
-  if (std::isnan(frequency) || std::isnan(calibration_dry) || std::isnan(calibration_wet)) {
+void HumiditySensor::process_input(float frequency) {
+
+  if(std::isnan(frequency)){
+    this->publish_state(NAN);
     return;
   }
+
+  auto calibration_dry = this->get_calibration_dry();
+  auto calibration_wet = this->get_calibration_wet();
+  if (std::isnan(calibration_dry) || std::isnan(calibration_wet)) {
+    return;
+  }
+
+  
   auto humidity = this->calc_humidity(frequency, calibration_dry, calibration_wet);
   this->publish_state(humidity);
 }

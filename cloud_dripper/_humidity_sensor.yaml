@@ -15,15 +15,14 @@ sensor:
   - multiply: 0.016666667
   - sliding_window_moving_average:
       window_size: 30
-      send_every: 10
-
-humidity_sensor:
-  - id: humidity_${id}
-    name: Humidity sensor ${id}
-    calibration_dry:
-      id: calibration_max_humidity_${id}
-      name: Calibration dry ${id}
-    calibration_wet:
-      id: calibration_min_humidity_${id}
-      name: Calibration Wet ${id}
-    input: sense_${id}
+      send_every: 10  
+- id: humidity_${id}
+  platform: humidity_sensor
+  name: Humidity sensor ${id}
+  calibration_dry:
+    id: calibration_max_humidity_${id}
+    name: Calibration dry ${id}
+  calibration_wet:
+    id: calibration_min_humidity_${id}
+    name: Calibration Wet ${id}
+  input: sense_${id}
