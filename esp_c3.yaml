@@ -41,7 +41,7 @@ backup:
 wifi:
   ssid: !secret wifi_iot_ssid
   password: !secret wifi_iot_password
-  use_address: 192.168.8.166
+  use_address: esphome_c31.local # 192.168.8.166
   output_power: "8.5"
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
