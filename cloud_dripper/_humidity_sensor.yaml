@@ -12,17 +12,21 @@ sensor:
   unit_of_measurement: 'Hz'
   timeout: 5s
   filters:
+  - timeout: 30s
   - multiply: 0.016666667
   - sliding_window_moving_average:
       window_size: 30
       send_every: 10  
+  - throttle: 1s
 - id: humidity_${id}
   platform: humidity_sensor
   name: Humidity sensor ${id}
   calibration_dry:
     id: calibration_max_humidity_${id}
     name: Calibration dry ${id}
+    max_value: 50000
   calibration_wet:
     id: calibration_min_humidity_${id}
     name: Calibration Wet ${id}
+    max_value: 50000
   input: sense_${id}
