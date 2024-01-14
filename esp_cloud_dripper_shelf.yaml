@@ -2,48 +2,49 @@ substitutions:
   name: clouddrip
   ip: clouddrip-293a7c.local 
   #ip: 192.168.8.179 #192.168.8.178
-  filename: cloud_dripper/esp_cloud_dripper_shelf.yaml
+  filename: esp_cloud_dripper_shelf.yaml
 
 packages:
-  pinout: !include _pinout.yaml
+  pinout:  !include cloud_dripper/_pinout.yaml
   humidity_sensor1: !include 
-    file: _humidity_sensor.yaml
+    file: cloud_dripper/_humidity_sensor.yaml
     vars: 
       id: 1
       pin: ${gpio_sense_1}
   humidity_sensor2: !include
-    file: _humidity_sensor.yaml
+    file: cloud_dripper/_humidity_sensor.yaml
     vars:
       id: 2
       pin: ${gpio_sense_2}
   humidity_sensor3: !include
-    file: _humidity_sensor.yaml
+    file: cloud_dripper/_humidity_sensor.yaml
     vars:
       id: 3
       pin: ${gpio_sense_3}
-  leds: !include _leds.yaml
-  system: !include _system_base.yaml
-  pumps: !include _pumps_switches.yaml
-  additiona_sensors: !include _additional_sensors.yaml
-  settings: !include _configurable_settings.yaml
-  sprinklers: !include _sprinklers.yaml
-
+  leds:  !include cloud_dripper/_leds.yaml
+  system:  !include cloud_dripper/_system_base.yaml
+  pumps:  !include cloud_dripper/_pumps_switches.yaml
+  additional_sensors:  !include cloud_dripper/_additional_sensors.yaml
+  settings:  !include cloud_dripper/_configurable_settings.yaml
+  sprinklers:  !include cloud_dripper/_sprinklers.yaml
 
 font:
-  - file: "../font/nerd_fonts/ProggyCleanCENerdFontMono-Regular.ttf"
+  - file: "font/nerd_fonts/ProggyCleanCENerdFontMono-Regular.ttf"
     id: gliphs
     size: 34
     glyphs: "󰓾󰧱"
-  - file: "../font/Sono/static/Sono/Sono-Regular.ttf"
+  - file: "font/Sono/static/Sono/Sono-Regular.ttf"
     id: labels
     glyphs: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- .,:&|/°%"
     size: 14
-  - file: "../font/Sono/static/Sono/Sono-Regular.ttf"
+  - file: "font/Sono/static/Sono/Sono-Regular.ttf"
     id: font_standard
     glyphs: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- .,:&|/°%"
     size: 12
 display:
   - platform: ssd1306_i2c
+    update_interval: 5s
+    contrast: 30%
     model: "SSD1306 128x32"
     lambda: |-
       it.print(0, 8, id(gliphs), TextAlign::CENTER_LEFT, u8"");

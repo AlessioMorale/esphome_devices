@@ -4,6 +4,8 @@
 
 #ifndef isnan
 using std::isnan;
+using std::min;
+using std::max;
 #endif
 
 namespace esphome {
@@ -76,7 +78,8 @@ void HumiditySensor::process_input(float frequency) {
 
 float HumiditySensor::calc_humidity(float frequency, float calibration_dry, float calibration_wet) {
   auto ret = 100.0f - (frequency - calibration_wet) / calibration_dry * 100.0f;
-  return ret;
+
+  return max(0.0f, min(ret, 100.0f));
 }
 
 }  // namespace humidity_sensor

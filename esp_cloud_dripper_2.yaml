@@ -1,0 +1,102 @@
+substitutions:
+  name: clouddrip
+  ip: clouddrip-28b1e8.local
+  filename: esp_cloud_dripper_2.yaml
+  #ip: 192.168.8.179 #192.168.8.178
+
+packages:
+  pinout: !include cloud_dripper/_pinout.yaml
+  humidity_sensor1: !include
+    file: cloud_dripper/_humidity_sensor.yaml
+    vars:
+      id: 1
+      pin: ${gpio_sense_1}
+  humidity_sensor2: !include
+    file: cloud_dripper/_humidity_sensor.yaml
+    vars:
+      id: 2
+      pin: ${gpio_sense_2}
+  humidity_sensor3: !include
+    file: cloud_dripper/_humidity_sensor.yaml
+    vars:
+      id: 3
+      pin: ${gpio_sense_3}
+  leds: !include cloud_dripper/_leds.yaml
+  sprinklers: !include cloud_dripper/_sprinklers.yaml
+  system: !include cloud_dripper/_system_base.yaml
+  pumps: !include cloud_dripper/_pumps_switches.yaml
+  additional_sensors: !include cloud_dripper/_additional_sensors.yaml
+  settings: !include cloud_dripper/_configurable_settings.yaml
+
+
+font:
+  - file: "font/nerd_fonts/ProggyCleanCENerdFontMono-Regular.ttf"
+    id: gliphs
+    size: 34
+    glyphs: "󰓾󰧱"
+  - file: "font/Sono/static/Sono/Sono-Regular.ttf"
+    id: labels
+    glyphs: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- .,:&|/°%"
+    size: 14
+  - file: "font/Sono/static/Sono/Sono-Regular.ttf"
+    id: font_standard
+    glyphs: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- .,:&|/°%"
+    size: 12
+  - file: "font/slkscr.ttf"
+    id: font_small
+    glyphs: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- .,:&|/°%"
+    size: 8
+  - file: "font/nerd_fonts/ProggyCleanCENerdFontMono-Regular.ttf"
+    id: small_gliphs
+    size: 18
+    glyphs: "󰖎󱡕󰔄󰟤󱫡󱩅󰖩󰀂"
+display:
+  - platform: ssd1306_i2c
+    rotation: 0
+    contrast: 30%
+    model: "SH1106 128x64"
+    lambda: |-
+      it.print(0, 8, id(gliphs), TextAlign::CENTER_LEFT, u8"");
+      it.print(18, 0, id(labels), u8"CloudDripper");
+
+      it.print(0, 18 + 5, id(gliphs), TextAlign::CENTER_LEFT, u8"");
+
+      it.graph(15, 18, id(temperature_graph_1));
+      it.graph(15 + 36, 18, id(temperature_graph_2));
+      it.graph(15 + 36*2, 18, id(temperature_graph_3));
+
+      it.printf(15, 40, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_1).state); 
+      it.printf(15+36, 40, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_2).state); 
+      it.printf(15+36*2, 40, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_3).state);
+
+
+      it.print (100, 64 - 5, id(small_gliphs), TextAlign::CENTER_RIGHT, u8"󰖩");
+      it.printf(100, 64, id(font_small), TextAlign::BOTTOM_LEFT, "%.0f", id(wifi_rssi).state);
+      it.print (13, 64 - 5, id(small_gliphs), TextAlign::CENTER_RIGHT, u8"󰀂");
+      it.printf(16, 64 , id(font_small), TextAlign::BOTTOM_LEFT, "%s", id(wifi_ip).state.c_str() );
+
+graph:
+  - id: temperature_graph_1
+    duration: 1h
+    y_grid: 50
+    width: 35
+    height: 20
+    max_range: 100
+    min_range: 1
+    sensor: humidity_1
+  - id: temperature_graph_2
+    duration: 1h
+    y_grid: 50
+    width: 35
+    height: 20
+    max_range: 100
+    min_range: 1
+    sensor: humidity_2
+  - id: temperature_graph_3
+    duration: 1h
+    y_grid: 50
+    width: 35
+    height: 20
+    max_range: 100
+    min_range: 1
+    sensor: humidity_3
