@@ -48,40 +48,56 @@ sprinkler:
           unit_of_measurement: s
           icon: "mdi:timer-outline"
           mode: slider 
+globals:
+   - id: iteration_counter
+     type: int
+     restore_value: no
+     initial_value: '0'
 time:
   - platform: sntp
     on_time:
+      - hours: 9, 14, 20
+        minutes: 0
+        seconds: 0
+        then:
+          - lambda: 'id(iteration_counter) = id(number_of_cycles).state;'
+
       # Every 5 minutes
       - hours: 9, 14, 20
-        minutes: 0, 5, 10
-        seconds: 0
+        minutes: /5
+        seconds: 1
         then:
             - sprinkler.clear_queued_valves: sprinkler_ctrlr
             - if:
                 condition:
-                  lambda: 'return id(humidity_1).state < 90;'
+                  lambda: 'return id(iteration_counter) > 0;'
                 then:
-                  - logger.log: "queuing pump_0"
-                  - sprinkler.queue_valve:
-                      id: sprinkler_ctrlr
-                      valve_number: 0
-                      run_duration: 0s
-            - if:
-                condition:
-                  lambda: 'return id(humidity_2).state < 90;'
-                then:
-                  - logger.log: "queuing pump_1"
-                  - sprinkler.queue_valve:
-                      id: sprinkler_ctrlr
-                      valve_number: 1
-                      run_duration: 0s
-            - if:
-                condition:
-                  lambda: 'return id(humidity_3).state < 90;'
-                then:
-                  - logger.log: "queuing pump_2"
-                  - sprinkler.queue_valve:
-                      id: sprinkler_ctrlr
-                      valve_number: 2
-                      run_duration: 0s
-            - sprinkler.start_from_queue: sprinkler_ctrlr
+                  - if:
+                      condition:
+                        lambda: 'return id(humidity_1).state < 90 || isnan(id(humidity_1).state);'
+                      then:
+                        - logger.log: "queuing pump_0"
+                        - sprinkler.queue_valve:
+                            id: sprinkler_ctrlr
+                            valve_number: 0
+                            run_duration: 0s
+                  - if:
+                      condition:
+                        lambda: 'return id(humidity_2).state < 90 || isnan(id(humidity_2).state);'
+                      then:
+                        - logger.log: "queuing pump_1"
+                        - sprinkler.queue_valve:
+                            id: sprinkler_ctrlr
+                            valve_number: 1
+                            run_duration: 0s
+                  - if:
+                      condition:
+                        lambda: 'return id(humidity_3).state < 90 || isnan(id(humidity_3).state);'
+                      then:
+                        - logger.log: "queuing pump_2"
+                        - sprinkler.queue_valve:
+                            id: sprinkler_ctrlr
+                            valve_number: 2
+                            run_duration: 0s
+                  - sprinkler.start_from_queue: sprinkler_ctrlr
+                  - lambda: 'id(iteration_counter) =- 1;'

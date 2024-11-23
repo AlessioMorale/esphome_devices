@@ -44,6 +44,7 @@ font:
 display:
   - platform: ssd1306_i2c
     update_interval: 5s
+    rotation: 180
     contrast: 30%
     model: "SSD1306 128x32"
     lambda: |-
@@ -51,6 +52,6 @@ display:
       it.print(18, 0, id(labels), u8"CloudDripper");
 
       it.print(0, 18 + 5, id(gliphs), TextAlign::CENTER_LEFT, u8"");
-      it.printf(25, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_1).state); 
-      it.printf(55, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_2).state); 
-      it.printf(85, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_3).state);
+      it.printf(23, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_1).state);
+      it.printf(54, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_2).state);
+      it.printf(86, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_3).state);

@@ -30,6 +30,7 @@ logger:
 api:
 
 ota:
+  platform: esphome
 
 i2c:
   sda: ${gpio_sda}
@@ -51,7 +52,6 @@ backup:
   auth:
     username: !secret web_username
     password: !secret web_password
-  force_update: false
 
 wifi:
   ssid: !secret wifi_iot_ssid

@@ -52,51 +52,14 @@ font:
     glyphs: "󰖎󱡕󰔄󰟤󱫡󱩅󰖩󰀂"
 display:
   - platform: ssd1306_i2c
-    rotation: 0
+    rotation: 180
     contrast: 30%
-    model: "SH1106 128x64"
+    model: "SSD1306 128x32"
     lambda: |-
       it.print(0, 8, id(gliphs), TextAlign::CENTER_LEFT, u8"");
       it.print(18, 0, id(labels), u8"CloudDripper");
 
       it.print(0, 18 + 5, id(gliphs), TextAlign::CENTER_LEFT, u8"");
-
-      it.graph(15, 18, id(temperature_graph_1));
-      it.graph(15 + 36, 18, id(temperature_graph_2));
-      it.graph(15 + 36*2, 18, id(temperature_graph_3));
-
-      it.printf(15, 40, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_1).state); 
-      it.printf(15+36, 40, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_2).state); 
-      it.printf(15+36*2, 40, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_3).state);
-
-
-      it.print (100, 64 - 5, id(small_gliphs), TextAlign::CENTER_RIGHT, u8"󰖩");
-      it.printf(100, 64, id(font_small), TextAlign::BOTTOM_LEFT, "%.0f", id(wifi_rssi).state);
-      it.print (13, 64 - 5, id(small_gliphs), TextAlign::CENTER_RIGHT, u8"󰀂");
-      it.printf(16, 64 , id(font_small), TextAlign::BOTTOM_LEFT, "%s", id(wifi_ip).state.c_str() );
-
-graph:
-  - id: temperature_graph_1
-    duration: 1h
-    y_grid: 50
-    width: 35
-    height: 20
-    max_range: 100
-    min_range: 1
-    sensor: humidity_1
-  - id: temperature_graph_2
-    duration: 1h
-    y_grid: 50
-    width: 35
-    height: 20
-    max_range: 100
-    min_range: 1
-    sensor: humidity_2
-  - id: temperature_graph_3
-    duration: 1h
-    y_grid: 50
-    width: 35
-    height: 20
-    max_range: 100
-    min_range: 1
-    sensor: humidity_3
+      it.printf(23, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_1).state); 
+      it.printf(54, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_2).state); 
+      it.printf(86, 18, id(font_standard), u8"%.0f%%", TextAlign::RIGHT, id(humidity_3).state);
