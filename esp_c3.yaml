@@ -1,21 +1,29 @@
+---
 substitutions:
   name: esphome_c31
+  filename: esphome_c3.yaml
 esphome:
+  project:
+    name: alessiomorale.$name
+    version: "1.0"
   name: $name
   platformio_options:
     board_build.f_flash: 40000000L
     board_build.flash_mode: dio
     board_build.flash_size: 4MB
     board_build.variant: esp32c3
+    board_upload.before_reset: usb_reset
+    build_flags: -DARDUINO_USB_CDC_ON_BOOT=1 -DARDUINO_USB_MODE=1
+
+dashboard_import:
+  package_import_url: github://AlessioMorale/esphome_devices/${filename}@main
+  import_full_config: true
 
 esp32:
-  #board: lolin_c3_mini
   board: esp32-c3-devkitm-1
   variant: esp32c3
   framework:
     type: arduino
-#    version: 2.0.5
-#    platform_version: 5.2.0
 
 # Enable Home Assistant API
 api:
@@ -24,6 +32,7 @@ bluetooth_proxy:
   active: true
 
 ota:
+  platform: esphome
 
 logger:
   baud_rate: 0
@@ -36,7 +45,6 @@ backup:
   auth:
     username: !secret web_username
     password: !secret web_password
-  force_update: false
 
 wifi:
   ssid: !secret wifi_iot_ssid
@@ -100,7 +108,7 @@ font:
   - file: "font/slkscr.ttf"
     id: labels_small
     size: 10
-    glyphs: "!\"%()+=,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<µ"
+    glyphs: "!\"%()+=,-_.:0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<"
 
 
 display:
@@ -159,22 +167,29 @@ sensor:
           send_every: 2
     id: wifi_rssi
 
-  - platform: sds011
+  - platform: pmsx003
+    type: PMS5003T
+    pm_1_0:
+      name: "Particulate Matter <1.0µm Concentration"
+      id: pm_1_0
+      accuracy_decimals: 2
     pm_2_5:
       name: "Particulate Matter <2.5µm Concentration"
       id: pm_2_5
-      filters:
-      - sliding_window_moving_average:
-          window_size: 5
-          send_every: 1
+      accuracy_decimals: 2
     pm_10_0:
       name: "Particulate Matter <10.0µm Concentration"
       id: pm_10_0
-      filters:
-      - sliding_window_moving_average:
-          window_size: 5
-          send_every: 1
-    update_interval: 5min
+      accuracy_decimals: 2
+    temperature:
+      name: "PM Temperature"
+      id: pm_temp
+      accuracy_decimals: 2
+    humidity:
+      name: "PM Humidity"
+      id: pm_hum
+      accuracy_decimals: 2
+    update_interval: 120s # 5min
 
   - platform: sht3xd
     temperature:
@@ -244,9 +259,9 @@ sensor:
     # 29/08/2022 eCO2 0x8DE9, TVOC 0x9207
     # 23/12/2022 eCO2 0x9111, TVOC 0x930B
     # 02/02/2023 eCO2 0x8F32, TVOC 0x9470
-    baseline:
-      eco2_baseline: 0x8F32
-      tvoc_baseline: 0x9470
+    # baseline:
+    #   eco2_baseline: 0x8F32
+    #   tvoc_baseline: 0x9470
     store_baseline: true
     address: 0x58
     update_interval: 1s
